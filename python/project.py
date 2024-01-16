@@ -8,6 +8,15 @@ from selenium.common.exceptions import NoSuchElementException
 import math
 from selenium.webdriver.common.alert import Alert
 from selenium.common.exceptions import NoAlertPresentException
+import zipfile
+import psycopg2
+import os
+from selenium.webdriver.support.ui import WebDriverWait
+
+## 오류 모음
+## 
+
+
 
 
 options = Options()
@@ -22,6 +31,15 @@ driver = webdriver.Chrome(options=options)
 url = "https://www.data.go.kr/tcs/dss/selectDataSetList.do?keyword=날씨"
 
 driver.get(url)
+
+
+#PostgreSQL 연결 설정
+connection = psycopg2.connect(
+    port="5432",
+    user="postgres",
+    password="1234"
+)
+
 
 
 time.sleep(2)
@@ -42,6 +60,9 @@ pages = math.ceil(total_page / page_size)
 print(pages)
 
 
+
+
+
 # 오픈API 상세페이지 크롤링
 #def open_api_detail_page_crawling():
 
@@ -49,31 +70,13 @@ print(pages)
 
 # 파일 데이터 상세페이지 크롤링
 def file_data_detail_page_crawling():
-
-     # # 파일 다운로드 클릭
-    try:
-        div_download = driver.find_element(By.CSS_SELECTOR, ".d-flex.float-r.just-pc")
-        action = ActionChains(driver)
-        action.move_to_element(div_download).perform()
-        a_tag = div_download.find_element(By.CSS_SELECTOR, "a")
-        if a_tag.text == "다운로드":
-           a_tag.click()
-           time.sleep(1)
-           try:
-               alert = Alert(driver)
-               alert.accept()
-           except NoAlertPresentException:
-                print("alert가 나타나지 않았습니다.")
-           time.sleep(3)
-    except NoSuchElementException:
-        print("다운로드 요소를 찾을 수 없습니다.")
-    
-
+     
     tbody = driver.find_element(By.CSS_SELECTOR, ".file-meta-table-pc > table > tbody")
     tr = tbody.find_elements(By.CSS_SELECTOR, "tr")
     #파일데이터명
     td_01 = tr[0].find_element(By.CSS_SELECTOR, "td")
-    print(f"파일데이터명:{td_01.text}")
+    file_name_td01 = td_01.get_attribute("innerText")
+    print(f"파일데이터명:{file_name_td01}")
 
     td = tr[1].find_elements(By.CSS_SELECTOR, "td")
     #분류체계
@@ -148,6 +151,90 @@ def file_data_detail_page_crawling():
     td_21 = tr[12].find_element(By.CSS_SELECTOR, "td")
     print(f"기타 유의사항:{td_21.text}")
 
+    # # 파일 다운로드 클릭 : target_folder는 다운로드 클릭 시 다운되는 곳
+    target_folder = 'C:\\Users\\PC\\Downloads\\'
+    #C:\Users\PC\Downloads, 'C:\\Users\\USER\\Downloads\\'
+
+    file_name = file_name_td01 + ".csv" 
+
+    try:
+        div_download = driver.find_element(By.CSS_SELECTOR, ".d-flex.float-r.just-pc")
+        action = ActionChains(driver)
+        action.move_to_element(div_download).perform()
+        a_tag = div_download.find_element(By.CSS_SELECTOR, "a")
+        if a_tag.text == "다운로드":
+           a_tag.click()
+           time.sleep(1)
+           try:
+               alert = Alert(driver)
+               alert.accept()   
+           except NoAlertPresentException:
+                print("alert가 나타나지 않았습니다.")
+
+           time.sleep(10)
+           # 나중에 다운로드가 제대로 완료되면 다음으로 가지게 바꿔야함
+           create_zip_file(target_folder, file_name)     
+           time.sleep(3)
+    except NoSuchElementException:
+        print("다운로드 요소를 찾을 수 없습니다.")
+
+    detail_pk = insert_detail_page(
+    file_name_td01, #파일명
+    td_02.text,  # 분류체계
+    td_03.text,  # 제공기관
+    td_04.text,  # 관리부서명
+    td_05.text,  # 관리부서 전화번호
+    td_06.text,  # 보유근거
+    td_07.text,  # 수집방법
+    td_08.text,  # 업데이트 주기
+    td_09.text,  # 차기 등록 예정일
+    td_10.text,  # 매체유형
+    td_11.text,  # 전체 행
+    td_12.text,  # 확장자
+    td_13.text,  # 키워드
+    td_14.text,  # 누적 다운로드
+    td_15.text,  # 다운로드
+    td_16.text,  # 등록일
+    td_17.text,  # 수정일
+    td_18.text,  # 데이터 한계
+    td_19.text,  # 제공형태
+    td_20.text,  # 설명
+    td_21.text   # 기타 유의사항
+    )
+
+    return detail_pk
+
+
+
+
+        
+
+
+
+def create_zip_file(target_folder, file_name):
+    file_name_without_extension = os.path.splitext(file_name)[0]
+    source_path = os.path.join(target_folder, file_name)
+    zip_path = os.path.join(target_folder, file_name_without_extension + ".zip")
+    time.sleep(3)
+    try:
+        with zipfile.ZipFile(zip_path, 'w') as zipf:
+            zipf.write(source_path, arcname=file_name)
+        print("압축 파일이 성공적으로 생성되었습니다.")
+        time.sleep(3)
+        os.remove(source_path)
+        time.sleep(3)
+        
+    except Exception as e:
+        print(f"압축 파일 생성 중 오류 발생: {e}")
+
+
+
+
+
+
+
+
+    # 아래 2개만 오류남 이유를 찾는중
 
     # td = tr[13].find_elements(By.CSS_SELECTOR, "td")
     # #비용부과유무
@@ -160,7 +247,54 @@ def file_data_detail_page_crawling():
     # td_25 = tr[14].find_element(By.CSS_SELECTOR, "td")
     # print(f"이용허락범위:{td_25.text}")
 
+def insert_detail_page(file_name, classification_system, providing_agency, department_name, 
+                department_phone_number, legal_basis, collection_method, update_period, 
+                next_registration_date, media_type, total_rows, extension, keywords, 
+                cumulative_downloads, downloads, registration_date, modification_date, 
+                data_limit, provision_form, description, other_notes):
+    #file_path = f'C:\\Users\\USER\\Downloads\\{file_name}', file_path = f'C:\\Users\\PC\\Downloads\\{file_name}'
+    file_path = f'C:\\Users\\PC\\Downloads\\{file_name}.zip'
+    try:
+        with open(file_path, 'rb') as file:
+            file_data = file.read()
+    except FileNotFoundError:
+        print("다운로드한 파일이 없습니다.")
+        file_data = ''
+    with connection, connection.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO public.detail (
+                    file_name, classification_system, providing_agency, department_name, 
+                    department_phone_number, legal_basis, collection_method, update_period, 
+                    next_registration_date, media_type, total_rows, extension, keywords, 
+                    cumulative_downloads, downloads, registration_date, modification_date, 
+                    data_limit, provision_form, description, other_notes, file
+                ) VALUES (
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                ) RETURNING id
+            """, (file_name, classification_system, providing_agency, department_name, 
+                    department_phone_number, legal_basis, collection_method, update_period, 
+                    next_registration_date, media_type, total_rows, extension, keywords, 
+                    cumulative_downloads, downloads, registration_date, modification_date, 
+                    data_limit, provision_form, description, other_notes, file_data))
+        connection.commit()
+        detail_pk_id = cursor.fetchone()[0]
+        return detail_pk_id
+
    
+def insert_main_page(title, content, provider, date, view, download, periodic_data, keywords_str):
+    with connection, connection.cursor() as cursor:
+        cursor.execute("INSERT INTO public.main (title, content, provider, date, view, download, periodic_data, keywords_str) VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id", (title, content, provider, date, view, download, periodic_data, keywords_str))
+        connection.commit()
+        main_pk_id = cursor.fetchone()[0]
+        return main_pk_id
+    
+def insert_main_detail_relation(main_id, detail_id):
+    with connection, connection.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO public.main_detail_relation (main_id, detail_id)
+            VALUES (%s, %s)
+        """, (main_id, detail_id))
+        connection.commit()
 
 
 # 메인페이지 크롤링
@@ -228,29 +362,19 @@ def page_crawling():
         print(f"키워드: {keywords_str}")
 
 
-        # print(f"title: {title.text}, content: {content.text}, 제공기간: {provider}, 수정일: {date}, 조회수: {view}, 다운로드: {download} ")
+        #print(f"title: {title.text}, content: {content.text}, 제공기간: {provider}, 수정일: {date}, 조회수: {view}, 다운로드: {download} ")
 
-
-
-        # # 파일 다운로드
-        # div = result.find_elements(By.CSS_SELECTOR, "div")
-        # bottom_area = div[1]
-        # a = bottom_area.find_element(By.CSS_SELECTOR, "a")
-        # if a.text == "다운로드":
-        #     action = ActionChains(driver)
-        #     action.move_to_element(bottom_area).perform()
-        #     a.click()
-        #     time.sleep(3)
-        # else:
-        #     print("파일 다운 불가")    
-    
-
+        time.sleep(1)
+        main_pk_id = insert_main_page(title.text, content.text, provider, date, view, download, periodic_data, keywords_str)
+        time.sleep(1)
+        
 
         # 상세 페이지 부분
         title.click()
         time.sleep(2)
         #나중에 if 로 파일데이터, 오픈API 선택해서 상세페이지 크롤링 
-        file_data_detail_page_crawling()
+        detail_pk = file_data_detail_page_crawling()
+        insert_main_detail_relation(main_pk_id, detail_pk)
         driver.back()
         time.sleep(2)
     
@@ -271,4 +395,4 @@ for page_num in range(1, pages + 1):
 
 
 time.sleep(2)
-driver.quit()  
+driver.quit() 

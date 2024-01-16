@@ -1,0 +1,44 @@
+CREATE TABLE public.detail (
+    id SERIAL PRIMARY KEY,
+    file_name VARCHAR(255),
+    classification_system VARCHAR(255),
+    providing_agency VARCHAR(255),
+    department_name VARCHAR(255),
+    department_phone_number VARCHAR(255),
+    legal_basis VARCHAR(255),
+    collection_method VARCHAR(255),
+    update_period VARCHAR(255),
+    next_registration_date VARCHAR(255),
+    media_type VARCHAR(255),
+    total_rows VARCHAR(255),
+    extension VARCHAR(255),
+    keywords VARCHAR(255),
+    cumulative_downloads VARCHAR(255),
+    downloads VARCHAR(255),
+    registration_date VARCHAR(255),
+    modification_date VARCHAR(255),
+    data_limit VARCHAR(255),
+    provision_form VARCHAR(255),
+    description TEXT,
+    other_notes VARCHAR(255),
+    file BYTEA
+);
+
+
+CREATE TABLE main (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255),
+    content TEXT,
+    provider VARCHAR(255),
+    date DATE,
+    view INTEGER,
+    download INTEGER,
+    periodic_data VARCHAR(255),
+    keywords_str VARCHAR(255)
+);
+
+CREATE TABLE public.main_detail_relation (
+    main_id INT REFERENCES public.main(id),
+    detail_id INT REFERENCES public.detail(id),
+    PRIMARY KEY (main_id, detail_id)
+);
