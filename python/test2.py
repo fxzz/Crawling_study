@@ -84,3 +84,57 @@ items = data['response']['body']['items']['item']
 for item in items:
     print(item)
     print()
+
+
+
+
+CREATE TABLE WeatherData (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    tm VARCHAR(255),
+    rnum VARCHAR(255),
+    stnId VARCHAR(255),
+    stnNm VARCHAR(255),
+    ta VARCHAR(255),
+    taQcflg VARCHAR(255),
+    rn VARCHAR(255),
+    rnQcflg VARCHAR(255),
+    ws VARCHAR(255),
+    wsQcflg VARCHAR(255),
+    wd VARCHAR(255),
+    wdQcflg VARCHAR(255),
+    hm VARCHAR(255),
+    hmQcflg VARCHAR(255),
+    pv VARCHAR(255),
+    td VARCHAR(255),
+    pa VARCHAR(255),
+    paQcflg VARCHAR(255),
+    ps VARCHAR(255),
+    psQcflg VARCHAR(255),
+    ss VARCHAR(255),
+    ssQcflg VARCHAR(255),
+    icsr VARCHAR(255),
+    dsnw VARCHAR(255),
+    hr3Fhsc VARCHAR(255),
+    dc10Tca VARCHAR(255),
+    dc10LmcsCa VARCHAR(255),
+    clfmAbbrCd VARCHAR(255),
+    lcsCh VARCHAR(255),
+    vs VARCHAR(255),
+    gndSttCd VARCHAR(255),
+    dmstMtphNo VARCHAR(255),
+    ts VARCHAR(255),
+    tsQcflg VARCHAR(255),
+    m005Te VARCHAR(255),
+    m01Te VARCHAR(255),
+    m02Te VARCHAR(255),
+    m03Te VARCHAR(255)
+);
+
+INSERT INTO WeatherData (tm, rnum, stnId, stnNm, ta, taQcflg, rn, rnQcflg, ws, wsQcflg, wd, wdQcflg, hm, hmQcflg, pv, td, pa, paQcflg, ps, psQcflg, ss, ssQcflg, icsr, dsnw, hr3Fhsc, dc10Tca, dc10LmcsCa, clfmAbbrCd, lcsCh, vs, gndSttCd, dmstMtphNo, ts, tsQcflg, m005Te, m01Te, m02Te, m03Te)
+VALUES ('2024-01-14 23:00', '24', '211', '인제', '-0.4', '', NULL, '9', '0.2', '', '0', '', '88', '', '5.2', '-2.1', '997.5', '', '1022.9', '', '', '9', '', '3.7', '', '0', '0', '', '', '1942', '', '', '', '0.3', '', '', '', '');
+
+
+
+
+
+
