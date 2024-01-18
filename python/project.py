@@ -15,7 +15,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 ## 오류 모음
 ## 로그4j 사용, 압축은 스레드로, json 데이터를 처음에 받아서 저장 ?해 태그를 어드민에서 동적으로 , insert() 매개값을 객체로 넣기 
-
+#https://velog.io/@helloaltjs/Window-JEUS-%EC%84%A4%EC%B9%98%ED%95%98%EA%B8%B0
 
 
 
