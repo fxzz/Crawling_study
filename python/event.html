@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link href="../output.css" rel="stylesheet" />
+  </head>
+  <body>
+    <h1 class="text-3xl font-bold underline">Hello world!</h1>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300">
+      <button
+        id="toggleButton"
+        onclick="toggleDisplay()"
+        class="rounded-2xl bg-white text-blue-500 text-sm font-black py-2 px-4"
+      >
+        목록 보기
+      </button>
+      <div id="threatList" class="bg-white w-2/3 h-48 hidden">
+        <div class="font-bold">제보된 위협 목록</div>
+        <button onclick="toggleDisplay()">닫기</button>
+      </div>
+    </div>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300"></div>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300">,</div>
+    <div class="bg-blue-300">,</div>
+  </body>
+  <script>
+    function toggleDisplay() {
+      var threatList = document.getElementById("threatList");
+      var toggleButton = document.getElementById("toggleButton");
+
+      threatList.classList.toggle("hidden"); // hidden 클래스를 토글하여 디스플레이 여부를 조절
+
+      // 위협 목록이 보이는지 여부에 따라 버튼의 텍스트를 조절
+      if (threatList.classList.contains("hidden")) {
+        toggleButton.style.display = "block";
+      } else {
+        toggleButton.style.display = "none";
+      }
+    }
+  </script>
+</html>
